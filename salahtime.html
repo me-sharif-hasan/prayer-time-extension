@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prayer Times</title>
+    <link href="https://fonts.cdnfonts.com/css/al-fitrah-ramadhan" rel="stylesheet">
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="image/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="image/favicon-16x16.png">
+    <link rel="manifest" href="/site.webmanifest">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Al-Fitrah Ramadhan', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #1a1a2e 0%, #2a2a4a 100%);
+            color: #e6c992;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .wave-pattern {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320"><path fill="rgba(230,201,146,0.15)" fill-opacity="1" d="M0,192L48,186.7C96,181,192,171,288,176C384,181,480,203,576,208C672,213,768,203,864,192C960,181,1056,171,1152,165.3C1248,160,1344,160,1392,160L1440,160L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path></svg>');
+            background-size: cover;
+            background-repeat: no-repeat;
+            z-index: 0;
+        }
+
+        .stars {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%"><circle cx="5%" cy="5%" r="3" fill="rgba(230,201,146,0.6)"/><circle cx="15%" cy="25%" r="2" fill="rgba(230,201,146,0.4)"/><circle cx="30%" cy="10%" r="4" fill="rgba(230,201,146,0.5)"/><circle cx="45%" cy="35%" r="2" fill="rgba(230,201,146,0.3)"/><circle cx="60%" cy="15%" r="3" fill="rgba(230,201,146,0.6)"/><circle cx="75%" cy="40%" r="2" fill="rgba(230,201,146,0.4)"/><circle cx="85%" cy="20%" r="3" fill="rgba(230,201,146,0.5)"/><circle cx="95%" cy="30%" r="2" fill="rgba(230,201,146,0.3)"/></svg>');
+            animation: twinkle 4s infinite alternate;
+            z-index: 0;
+        }
+
+        .star-pattern {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><path fill="none" stroke="rgba(230,201,146,0.1)" stroke-width="1" d="M50,10 L60,40 L90,40 L65,60 L75,90 L50,70 L25,90 L35,60 L10,40 L40,40 Z M30,30 L50,50 L70,30 M30,70 L50,50 L70,70"/></svg>');
+            background-size: 100px;
+            opacity: 0.2;
+            z-index: 0;
+        }
+
+        @keyframes twinkle {
+            0% { opacity: 0.4; transform: scale(0.9); }
+            100% { opacity: 1; transform: scale(1.1); }
+        }
+
+        .clock-container {
+            position: relative;
+            width: 150px;
+            height: 150px;
+            margin-bottom: 2rem;
+            z-index: 1;
+            perspective: 1000px;
+        }
+
+        .sun-moon {
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            top: -40px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 2;
+            transition: background 1s ease;
+        }
+
+        .sun-moon.sun {
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="6" fill="%23e6c992"/><path fill="%23e6c992" d="M12 2v2m0 16v2m10-10h-2M4 12H2m16.364-5.364l-1.414 1.414M5.636 17.364l-1.414 1.414m13.728 0l-1.414-1.414M5.636 6.636l-1.414-1.414"/></svg>');
+        }
+
+        .sun-moon.moon {
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="%23e6c992" d="M12 3a9 9 0 0 0 9 9c0 4.97-4.03 9-9 9a9 9 0 0 1 0-18z"/></svg>');
+        }
+
+        .clock {
+            width: 100%;
+            height: 100%;
+            border: 4px solid #e6c992;
+            border-radius: 50%;
+            position: relative;
+            background: rgba(42, 42, 74, 0.5);
+            box-shadow: 0 4px 10px rgba(230, 201, 146, 0.3);
+            transform: rotateX(10deg);
+            will-change: transform;
+        }
+
+        .clock-number {
+            position: absolute;
+            color: #e6c992;
+            font-size: 1rem;
+            font-weight: 400;
+            text-align: center;
+        }
+
+        .number-12 { top: 5px; left: 50%; transform: translateX(-50%); }
+        .number-3 { right: 5px; top: 50%; transform: translateY(-50%); }
+        .number-6 { bottom: 5px; left: 50%; transform: translateX(-50%); }
+        .number-9 { left: 5px; top: 50%; transform: translateY(-50%); }
+
+        .hour, .minute, .second {
+            position: absolute;
+            bottom: 50%;
+            left: 50%;
+            transform-origin: bottom;
+            background: #e6c992;
+            border-radius: 2px;
+        }
+
+        .hour {
+            width: 4px;
+            height: 40px;
+        }
+
+        .minute {
+            width: 3px;
+            height: 50px;
+        }
+
+        .second {
+            width: 2px;
+            height: 60px;
+            background: #b8a374;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 2rem;
+            z-index: 1;
+        }
+
+        .header .date {
+            font-size: 1.3rem;
+            color: #b8a374;
+            font-weight: 400;
+        }
+
+        .search-container {
+            position: relative;
+            width: 90%;
+            max-width: 600px;
+            margin-bottom: 2rem;
+            z-index: 1;
+        }
+
+        .search-bar {
+            width: 100%;
+            padding: 0.8rem 2.5rem 0.8rem 1rem;
+            border: 2px solid #e6c992;
+            border-radius: 25px;
+            background: rgba(42, 42, 74, 0.5);
+            color: #e6c992;
+            font-family: 'Roboto', sans-serif;
+            font-size: 1rem;
+            outline: none;
+            transition: box-shadow 0.3s ease, transform 0.3s ease;
+        }
+
+        .search-bar::placeholder {
+            color: #b8a374;
+            opacity: 0.7;
+        }
+
+       
+
+        .search-icon {
+            position: absolute;
+            right: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 20px;
+            height: 20px;
+            fill: #e6c992;
+            transition: opacity 0.2s ease;
+        }
+
+        .prayer-times {
+            display: flex;
+            flex-direction: row;
+            gap: 1rem;
+            width: 90%;
+            max-width: 1200px;
+            overflow-x: auto;
+            padding: 1rem;
+            z-index: 1;
+            perspective: 1000px;
+            height: 227px;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .prayer-card {
+            flex: 0 0 160px;
+            width: 160px;
+            height: 160px;
+            background: #2a2a4a;
+            border: 2px solid #e6c992;
+            border-radius: 12px;
+            padding: 0.8rem;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(230, 201, 146, 0.2);
+            transform: rotateY(5deg);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            will-change: transform, box-shadow;
+        }
+
+        .prayer-card.upcoming {
+            background: linear-gradient(135deg, #e6c992 0%, #ffd700 100%);
+            box-shadow: 0 0 20px rgba(230, 201, 146, 0.7);
+            transform: scale(1.1) rotateY(0deg);
+        }
+
+        .prayer-card.upcoming::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(230, 201, 146, 0.5) 0%, rgba(230, 201, 146, 0) 70%);
+            transform: translate(-50%, -50%);
+            opacity: 0.5;
+            animation: glowFade 3s infinite ease-in-out;
+            z-index: 0;
+        }
+
+        @keyframes glowFade {
+            0%, 100% { opacity: 0.5; transform: translate(-50%, -50%) scale(1); }
+            50% { opacity: 0.8; transform: translate(-50%, -50%) scale(1.1); }
+        }
+
+        .prayer-card:hover {
+            transform: scale(1.05) rotateY(0deg);
+            box-shadow: 0 8px 20px rgba(230, 201, 146, 0.4);
+        }
+
+        .prayer-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><path fill="none" stroke="rgba(230,201,146,0.3)" stroke-width="2" d="M50,20 L60,40 L80,40 L65,60 L75,80 L50,70 L25,80 L35,60 L20,40 L40,40 Z M30,50 L50,30 L70,50 L50,70 Z"/><path fill="rgba(230,201,146,0.2)" d="M10,90 L20,80 H80 L90,90 Z"/></svg>');
+            background-size: 60%;
+            opacity: 0.4;
+            z-index: 0;
+        }
+
+        .prayer-icon {
+            width: 24px;
+            height: 24px;
+            margin: 0 auto 0.4rem;
+            display: block;
+            z-index: 1;
+        }
+
+        .prayer-card h3 {
+            font-family: 'Roboto', sans-serif;
+            font-size: 1.1rem;
+            margin-bottom: 0.3rem;
+            color: #e6c992;
+            font-weight: 700;
+            position: relative;
+            z-index: 1;
+            text-transform: uppercase;
+            text-align: center;
+        }
+
+        .prayer-card p {
+            font-family: 'Roboto', sans-serif;
+            font-size: 1.2rem;
+            font-weight: 400;
+            color: #ffffff;
+            position: relative;
+            z-index: 1;
+            text-align: center;
+        }
+
+        .prayer-card .countdown {
+            font-size: 0.8rem;
+            color: #ffffff;
+            margin-top: 0.2rem;
+            position: relative;
+            z-index: 1;
+            text-align: center;
+        }
+
+        .prayer-card.upcoming h3,
+        .prayer-card.upcoming p,
+        .prayer-card.upcoming .countdown {
+            color: #1a1a2e;
+        }
+
+        @media (max-width: 600px) {
+            .header .date {
+                font-size: 1.1rem;
+            }
+
+            .search-container {
+                width: 95%;
+            }
+
+            .search-bar {
+                font-size: 0.9rem;
+                padding: 0.6rem 2rem 0.6rem 0.8rem;
+            }
+
+            .search-icon {
+                width: 18px;
+                height: 18px;
+            }
+
+            .prayer-card {
+                width: 140px;
+                height: 140px;
+                padding: 0.6rem;
+            }
+
+            .prayer-card h3 {
+                font-size: 1rem;
+            }
+
+            .prayer-card p {
+                font-size: 1.1rem;
+            }
+
+            .prayer-card .countdown {
+                font-size: 0.7rem;
+            }
+
+            .prayer-icon {
+                width: 20px;
+                height: 20px;
+            }
+
+            .clock-container {
+                width: 120px;
+                height: 120px;
+            }
+
+            .clock-number {
+                font-size: 0.9rem;
+            }
+
+            .sun-moon {
+                width: 25px;
+                height: 25px;
+                top: -35px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="wave-pattern"></div>
+    <div class="stars"></div>
+    <div class="star-pattern"></div>
+    <div class="clock-container">
+        <div class="sun-moon"></div>
+        <div class="clock">
+            <div class="clock-number number-12">12</div>
+            <div class="clock-number number-3">3</div>
+            <div class="clock-number number-6">6</div>
+            <div class="clock-number number-9">9</div>
+            <div class="hour"></div>
+            <div class="minute"></div>
+            <div class="second"></div>
+        </div>
+    </div>
+    <div class="header">
+        <div class="date" id="currentDate"></div>
+    </div>
+    <div class="search-container">
+        <input autofocus type="search" class="search-bar" id="searchBar" placeholder="Search Google or enter a URL">
+        <svg class="search-icon" id="searchIcon" viewBox="0 0 24 24">
+            <path fill="currentColor" d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
+        </svg>
+    </div>
+    <div class="prayer-times" id="prayerTimes"></div>
+
+    <script src="script.js"></script>
+</body>
+</html>
