@@ -9,6 +9,9 @@
     "permissions": [
       "geolocation"
     ],
+    "background": {
+      "service_worker": "service-worker.js"
+    },
     "icons": {
       "16": "image/favicon-16x16.png",
       "32": "image/favicon-32x32.png",

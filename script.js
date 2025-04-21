@@ -1,3 +1,17 @@
+
+if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('service-worker.js')
+        .then(reg => console.log('Service Worker registered', reg))
+        .catch(err => console.error('Service Worker registration failed', err));
+
+    // Request notification permission
+    Notification.requestPermission().then(permission => {
+        if (permission === 'granted') {
+            console.log('Notification permission granted');
+        }
+    });
+}
+
 // Real-time analog clock and sun/moon animation
 function updateClockAndSunMoon() {
     const now = new Date();
@@ -122,6 +136,14 @@ function displayNoSalahCard() {
 
 // Function to display prayer times and highlight upcoming
 function displayPrayerTimes(timings) {
+    //send timings to service worker for notifications
+    if (navigator.serviceWorker.controller) {
+        navigator.serviceWorker.controller.postMessage({
+            type: 'SCHEDULE_PRAYER_NOTIFICATIONS',
+            timings: timings
+        });
+    }
+
     const prayerTimesContainer = document.getElementById('prayerTimes');
     const now = new Date();
     const currentSeconds = now.getHours() * 3600 + now.getMinutes() * 60 + now.getSeconds();
@@ -201,6 +223,7 @@ async function fetchPrayerTimesByCoords(latitude, longitude) {
                 timestamp: Date.now()
             };
             localStorage.setItem('prayerTimesCache', JSON.stringify(cache));
+            // Update display with fresh data
             displayPrayerTimes(data.data.timings);
             setInterval(() => displayPrayerTimes(data.data.timings), 1000);
             // Stop any retry attempts since we have fresh data
@@ -210,11 +233,11 @@ async function fetchPrayerTimesByCoords(latitude, longitude) {
             }
         } else {
             console.log("Error loading prayer times");
-            loadCachedData();
+            // Do not clear current display; keep showing cached data
         }
     } catch (error) {
         console.log("Error loading prayer times: ", error);
-        loadCachedData();
+        // Do not clear current display; keep showing cached data
         // Start retry mechanism if not already running
         if (!window.retryInterval && !navigator.onLine) {
             window.retryInterval = setInterval(() => {
@@ -273,9 +296,8 @@ window.addEventListener('offline', () => {
     loadCachedData();
 });
 
-// On page load, try to fetch new data if online, otherwise load cached data
+// On page load, display cached data immediately and fetch fresh data in the background
+loadCachedData(); // Show cached data first
 if (navigator.onLine) {
-    getUserLocation();
-} else {
-    loadCachedData();
+    getUserLocation(); // Fetch fresh data without clearing display
 }
